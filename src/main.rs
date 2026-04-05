@@ -258,6 +258,9 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
         .application_id(APP_ID)
         .flags(ApplicationFlags::HANDLES_OPEN)
         .build();
+    app.connect_open(|app, _files, _hint| {
+        app.activate();
+    });
     app.connect_activate(move |app| {
         if let Err(error) = activate(app, socket_path.clone(), timeout_ms) {
             eprintln!("whisp: {error:?}");
