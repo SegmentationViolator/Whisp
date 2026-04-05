@@ -268,7 +268,10 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
             app.quit();
         }
     });
-    let exit = app.run_with_args(&["whisp"]);
+    let argv0 = std::env::args()
+        .next()
+        .unwrap_or_else(|| String::from("whisp"));
+    let exit = app.run_with_args(&[argv0.as_str()]);
     if exit != ExitCode::SUCCESS {
         bail!("GTK application exited with status {exit:?}");
     }
