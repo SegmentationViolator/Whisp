@@ -13,6 +13,7 @@ use std::{
 use anyhow::{Context, Result, anyhow, bail};
 use clap::{Parser, Subcommand, ValueEnum};
 use gio::ApplicationFlags;
+use glib::ExitCode;
 use glib::{ControlFlow, SourceId};
 use gtk::{
     Application, ApplicationWindow, Box as GtkBox, CssProvider, Frame, Label, Orientation,
@@ -267,7 +268,10 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
             app.quit();
         }
     });
-    app.run();
+    let exit = app.run_with_args(&["whisp"]);
+    if exit != ExitCode::SUCCESS {
+        bail!("GTK application exited with status {exit:?}");
+    }
     Ok(())
 }
 
