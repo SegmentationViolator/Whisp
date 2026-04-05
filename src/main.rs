@@ -12,7 +12,6 @@ use std::{
 
 use anyhow::{Context, Result, anyhow, bail};
 use clap::{Parser, Subcommand, ValueEnum};
-use gio::ApplicationFlags;
 use glib::ExitCode;
 use glib::{ControlFlow, SourceId};
 use gtk::{
@@ -255,13 +254,7 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
         std::env::set_var("GDK_BACKEND", "wayland");
     }
 
-    let app = Application::builder()
-        .application_id(APP_ID)
-        .flags(ApplicationFlags::HANDLES_OPEN)
-        .build();
-    app.connect_open(|app, _files, _hint| {
-        app.activate();
-    });
+    let app = Application::builder().application_id(APP_ID).build();
     app.connect_activate(move |app| {
         if let Err(error) = activate(app, socket_path.clone(), timeout_ms) {
             eprintln!("whisp: {error:?}");
