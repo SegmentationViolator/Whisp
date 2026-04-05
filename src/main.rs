@@ -12,6 +12,7 @@ use std::{
 
 use anyhow::{Context, Result, anyhow, bail};
 use clap::{Parser, Subcommand, ValueEnum};
+use glib::ExitCode;
 use glib::{ControlFlow, SourceId};
 use gtk::{
     Application, ApplicationWindow, Box as GtkBox, CssProvider, Frame, Label, Orientation,
@@ -260,7 +261,14 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
             app.quit();
         }
     });
-    app.run();
+    let argv0 = std::env::args()
+        .next()
+        .unwrap_or_else(|| String::from("whisp"));
+    let exit = app.run_with_args(&[argv0.as_str()]);
+    if exit != ExitCode::SUCCESS {
+        let code: i32 = exit.into();
+        bail!("GTK application exited with non-zero status code {code}");
+    }
     Ok(())
 }
 
