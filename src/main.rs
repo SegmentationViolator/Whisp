@@ -266,7 +266,8 @@ fn run_daemon(socket_path: PathBuf, timeout_ms: u64) -> Result<()> {
         .unwrap_or_else(|| String::from("whisp"));
     let exit = app.run_with_args(&[argv0.as_str()]);
     if exit != ExitCode::SUCCESS {
-        bail!("GTK application exited with status {exit:?}");
+        let code: i32 = exit.into();
+        bail!("GTK application exited with non-zero status code {code}");
     }
     Ok(())
 }
